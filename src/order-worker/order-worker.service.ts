@@ -14,10 +14,9 @@ export class OrderWorkerService {
       const files = await readdir(folderPath);
       const processingFiles = files.slice(0, 10);  // Process up to 10 files
 
-      for (const file of processingFiles) {
+      await Promise.all(processingFiles.map(async (file) => {
         const filePath = join(folderPath, file);
         let retries = 0;
-
         while (retries < 3) {
           try {
             const data = await readFile(filePath, 'utf-8');
@@ -36,7 +35,7 @@ export class OrderWorkerService {
             if (retries >= 3) console.error(`Failed to process order file ${file}:`, error);
           }
         }
-      }
+      }));
     } catch (error) {
       console.error('Failed to process orders:', error);
     }
